@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+    <h3 class="center-align">Recipe Showcase</h3>
+
+    <!-- Add Recipe Form -->
+    <form action="/add" method="POST" class="card-panel">
+        <div class="input-field">
+            <input type="text" name="recipe_name" id="recipe_name" required>
+            <label for="recipe_name">Recipe Name</label>
+        </div>
+        <div class="input-field">
+            <textarea name="ingredients" id="ingredients" class="materialize-textarea" required></textarea>
+            <label for="ingredients">Ingredients</label>
+        </div>
+        <div class="input-field">
+            <textarea name="method" id="method" class="materialize-textarea" required></textarea>
+            <label for="method">Method</label>
+        </div>
+        <button type="submit" class="btn blue">Add Recipe</button>
+    </form>
+
+    <!-- Recipe List -->
+    <ul class="collection">
+        {% for recipe in recipes %}
+        <li class="collection-item">
+            <strong>{{ recipe.name }}</strong>
+            <p>Ingredients: {{ recipe.ingredients }}</p>
+            <p>Method: {{ recipe.method }}</p>
+            <form action="/delete/{{ recipe._id }}" method="POST" style="display:inline;">
+                <button type="submit" class="btn red">Delete</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+
+
+{% endblock %}
