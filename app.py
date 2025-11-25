@@ -15,6 +15,9 @@ app.config["MONGO_DBNAME"] = os.environ.get("MONGO_DBNAME")
 app.config["MONGO_URI"] = os.environ.get("MONGO_URI")
 app.secret_key = os.environ.get("SECRET_KEY")
 
+# MongoDB Configuration
+app.config["MONGO_URI"] = "mongodb+srv://mac1968:<zxc123>@clustermc.eowgl.mongodb.net/?retryWrites=true&w=majority&appName=ClusterMC"
+
 mongo = PyMongo(app)
 
 
