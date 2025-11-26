@@ -1,39 +1,47 @@
 import os
+# Import PyMongo for Flask instead of MongoClient from pymongo
 from flask import (
     Flask, flash, render_template,
     redirect, request, session, url_for)
-from flask_pymongo import PyMongo
+from flask_pymongo import PyMongo # <-- Fix 1: Added PyMongo for Flask
 from bson.objectid import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
+
+
+# Load environment variables if env.py exists
 if os.path.exists("env.py"):
     import env
 
 
 app = Flask(__name__)
 
+# Configure MongoDB connection
 app.config["MONGO_DBNAME"] = os.environ.get("MONGO_DBNAME")
 app.config["MONGO_URI"] = os.environ.get("MONGO_URI")
 app.secret_key = os.environ.get("SECRET_KEY")
 
-# MongoDB Configuration
-app.config["MONGO_URI"] = "mongodb+srv://mac1968:<zxc123>@clustermc.eowgl.mongodb.net/?retryWrites=true&w=majority&appName=ClusterMC"
+print("MONGO_URI:", os.environ.get("MONGO_URI"))
+print("MONGO_DBNAME:", os.environ.get("MONGO_DBNAME"))
 
+# Initialize PyMongo
 mongo = PyMongo(app)
 
 
 @app.route("/")
 @app.route("/get_recipes")
 def get_recipes():
+    """Displays a list of all recipes."""
     recipes = list(mongo.db.recipes.find())
     return render_template("get_recipes.html", recipes=recipes)
 
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    """Handles user registration."""
     if request.method == "POST":
-        # check if username already exists in db
+        # Check if username already exists in db
         existing_user = mongo.db.users.find_one(
-            {"username": request.form.get("username"). lower()})
+            {"username": request.form.get("username").lower()})
 
         if existing_user:
             flash("Username already exists")
@@ -45,54 +53,73 @@ def register():
         }
         mongo.db.users.insert_one(register)
 
-        # put the new user into 'session' cookie
+        # Put the new user into 'session' cookie
         session["user"] = request.form.get("username").lower()
         flash("Registration Successful!")
+        return redirect(url_for("profile")) # Redirect to profile after register
     return render_template("register.html")
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    """Handles user login."""
     if request.method == "POST":
-        # check if username exists in db
+        # Check if username exists in db
         existing_user = mongo.db.users.find_one(
             {"username": request.form.get("username").lower()})
         
         if existing_user:
-            # ensure hashed password matches user input
+            # Ensure hashed password matches user input
             if check_password_hash(
                 existing_user["password"], request.form.get("password")):
                     session["user"] = request.form.get("username").lower()
                     flash("Welcome, {}".format(request.form.get("username")))
+                    return redirect(url_for("profile")) # Redirect to profile on success
             else:
-                # invalid password match
+                # Invalid password match
                 flash("Incorrect Username and/or Password")
                 return redirect(url_for("login"))
-            
         else:
-            # username doesn't exist
+            # Username doesn't exist
             flash("Incorrect Username and/or Password")
             return redirect(url_for("login"))
+            
     return render_template("login.html")
 
 
-@app.route("/profile/<username>", methods=["GET", "POST"])
-def profile(username):
-    # grab the session user's username from db
-    username = mongo.db.users.find_one(
-        {"username": session["user"]})["username"]
+@app.route("/profile")
+# Removed <username> from the route, as it should show the current user's profile
+def profile():
+    """Shows the currently logged-in user's profile and requires login."""
+    if "user" not in session:
+        flash("You need to log in to view your profile.")
+        return redirect(url_for("login"))
+        
+    # Get the session user's username
+    username = session["user"]
+    
+    # Optional: fetch user data if needed, but the username itself is enough for the template
+    # user_data = mongo.db.users.find_one({"username": username}) 
+
     return render_template("profile.html", username=username)
 
 
 @app.route("/logout")
 def logout():
+    """Logs the user out by removing them from the session."""
     # remove user from session cookie
     flash("You have been logged out")
     session.pop("user")
     return redirect(url_for("login"))
 
+
 @app.route("/add_recipe", methods=["GET", "POST"])
 def add_recipe():
+    """Handles adding a new recipe to the database."""
+    if "user" not in session:
+        flash("You need to log in to add a recipe.")
+        return redirect(url_for("login"))
+        
     if request.method == "POST":
         recipe = {
             "course_name": request.form.get("course_name"),
@@ -103,14 +130,19 @@ def add_recipe():
             "serves": request.form.get("serves"),
             "created_by": session["user"]
         }
-        mongo.db.dishes.insert_one(recipe)
+        # Fix 3: Changed 'dishes' to 'recipes' for collection consistency
+        mongo.db.recipes.insert_one(recipe)
         flash("Recipe Successfully Added")
-        return redirect(url_for("add_recipe"))
-    courses = mongo.db.ccourses.find().sort("courses", 1)
-    return render_template("add_recipe.html", recipes=recipes)
+        return redirect(url_for("get_recipes")) # Redirect to recipes list
+        
+    # GET request logic
+    # Assume 'ccourses' holds the course categories
+    courses = list(mongo.db.ccourses.find().sort("courses", 1))
+    # Fix 2: Passing 'courses' to the template instead of the undefined 'recipes'
+    return render_template("add_recipe.html", courses=courses)
 
 
 if __name__ == "__main__":
     app.run(host=os.environ.get("IP"),
-            port=int(os.environ.get("PORT")),
+            port=int(os.environ.get("PORT", 5000)), # Changed default port to 5000 standard
             debug=True)
