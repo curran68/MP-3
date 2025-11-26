@@ -29,7 +29,7 @@
                     <li><a href="{{ url_for('add_recipe') }}">Add Recipe</a></li>
                     <li><a href="{{ url_for('logout') }}">Log Out</a></li>
                     {% else %}
-                    <li><a href="{{ url_for('recipes') }}">Recipes</a></li>
+                    <li><a href="{{ url_for('get_recipes') }}">Recipes</a></li>
                     <li><a href="{{ url_for('login') }}">Login</a></li>
                     <li><a href="{{ url_for('register') }}">Register</a></li>
                 {% endif %}
@@ -42,10 +42,10 @@
                     <li><a href="{{ url_for('get_recipes') }}">Home</a></li>
                 {% if session.user %}
                     <li><a href="{{ url_for('profile', username=session['user']) }}">Profile</a></li>
-                    <li><a href="{{ url_for('add_recipe') }}">Add Recipe</a></li
+                    <li><a href="{{ url_for('add_recipe') }}">Add Recipe</a></li>
                     <li><a href="{{ url_for('logout') }}">Log Out</a></li>
                 {% else %}
-                    <li><a href="{{ url_for('recipes') }}">Recipes</a></li>
+                    <li><a href="{{ url_for('get_recipes') }}">Recipes</a></li>
                     <li><a href="{{ url_for('login') }}">Login</a></li>
                     <li><a href="{{ url_for('register') }}">Register</a></li>
                 {% endif %}
@@ -84,7 +84,7 @@
         <div class="col s12 m4">
             <div class="card-image">
                 <img src="/static/images/taco1.jpg" alt="mexican food" class="responsive-image">
-                <a href="{{ url_for('recipes') }}">
+                <a href="{{ url_for('get_recipes') }}">
                 <span class="card-title">Starters</span>
                 </a>
             </div>
@@ -92,7 +92,7 @@
         <div class="col s12 m4">
             <div class="card-image">
                 <img src="/static/images/noodles.jpg" alt="mexican food" class="responsive-image">
-                <a href="{{ url_for('recipes') }}">
+                <a href="{{ url_for('get_recipes') }}">
                     <span class="card-title">Mains</span>
                     </a>
             </div>
@@ -100,7 +100,7 @@
         <div class="col s12 m4">
             <div class="card-image">
                 <img src="/static/images/cake.jpg" alt="mexican food" class="responsive-image">
-                <a href="{{ url_for('recipes') }}">
+                <a href="{{ url_for('get_recipes') }}">
                     <span class="card-title">Desserts</span>
                     </a>
             </div>

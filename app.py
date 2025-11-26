@@ -1,30 +1,29 @@
 import os
-# Import PyMongo for Flask instead of MongoClient from pymongo
 from flask import (
     Flask, flash, render_template,
     redirect, request, session, url_for)
-from flask_pymongo import PyMongo # <-- Fix 1: Added PyMongo for Flask
+from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from werkzeug.security import generate_password_hash, check_password_hash
 
-
-# Load environment variables if env.py exists
+# Load env variables for local development
 if os.path.exists("env.py"):
     import env
 
-
 app = Flask(__name__)
 
-# Configure MongoDB connection
-app.config["MONGO_DBNAME"] = os.environ.get("MONGO_DBNAME")
-app.config["MONGO_URI"] = os.environ.get("MONGO_URI")
-app.secret_key = os.environ.get("SECRET_KEY")
+# Mongo config
+app.config["MONGO_DBNAME"] = os.environ.get("MONGO_DBNAME", "recipes_db")
+app.config["MONGO_URI"] = os.environ.get("MONGO_URI", "mongodb://localhost:27017/recipes_db")
+app.secret_key = os.environ.get("SECRET_KEY", "devsecret")
 
-print("MONGO_URI:", os.environ.get("MONGO_URI"))
-print("MONGO_DBNAME:", os.environ.get("MONGO_DBNAME"))
-
-# Initialize PyMongo
 mongo = PyMongo(app)
+
+print("Debug Mongo:")
+print("URI =", app.config["MONGO_URI"])
+print("DBNAME =", app.config["MONGO_DBNAME"])
+print("Connection mongo.db =", mongo.db)
+
 
 
 @app.route("/")
@@ -39,24 +38,23 @@ def get_recipes():
 def register():
     """Handles user registration."""
     if request.method == "POST":
-        # Check if username already exists in db
-        existing_user = mongo.db.users.find_one(
-            {"username": request.form.get("username").lower()})
+        username = request.form.get("username").lower()
+
+        existing_user = mongo.db.users.find_one({"username": username})
 
         if existing_user:
             flash("Username already exists")
             return redirect(url_for("register"))
 
-        register = {
-            "username": request.form.get("username").lower(),
+        mongo.db.users.insert_one({
+            "username": username,
             "password": generate_password_hash(request.form.get("password"))
-        }
-        mongo.db.users.insert_one(register)
+        })
 
-        # Put the new user into 'session' cookie
-        session["user"] = request.form.get("username").lower()
+        session["user"] = username
         flash("Registration Successful!")
-        return redirect(url_for("profile")) # Redirect to profile after register
+        return redirect(url_for("profile"))
+
     return render_template("register.html")
 
 
@@ -64,62 +62,47 @@ def register():
 def login():
     """Handles user login."""
     if request.method == "POST":
-        # Check if username exists in db
-        existing_user = mongo.db.users.find_one(
-            {"username": request.form.get("username").lower()})
-        
-        if existing_user:
-            # Ensure hashed password matches user input
-            if check_password_hash(
-                existing_user["password"], request.form.get("password")):
-                    session["user"] = request.form.get("username").lower()
-                    flash("Welcome, {}".format(request.form.get("username")))
-                    return redirect(url_for("profile")) # Redirect to profile on success
-            else:
-                # Invalid password match
-                flash("Incorrect Username and/or Password")
-                return redirect(url_for("login"))
-        else:
-            # Username doesn't exist
-            flash("Incorrect Username and/or Password")
-            return redirect(url_for("login"))
-            
+        username = request.form.get("username").lower()
+        password = request.form.get("password")
+
+        existing_user = mongo.db.users.find_one({"username": username})
+
+        if existing_user and check_password_hash(existing_user["password"], password):
+            session["user"] = username
+            flash(f"Welcome, {username}!")
+            return redirect(url_for("profile"))
+
+        flash("Incorrect Username and/or Password")
+        return redirect(url_for("login"))
+
     return render_template("login.html")
 
 
-@app.route("/profile")
-# Removed <username> from the route, as it should show the current user's profile
+@app.route("/profile", methods=["GET", "POST"])
 def profile():
-    """Shows the currently logged-in user's profile and requires login."""
+    """Shows the currently logged-in user's profile."""
     if "user" not in session:
         flash("You need to log in to view your profile.")
         return redirect(url_for("login"))
-        
-    # Get the session user's username
-    username = session["user"]
-    
-    # Optional: fetch user data if needed, but the username itself is enough for the template
-    # user_data = mongo.db.users.find_one({"username": username}) 
 
-    return render_template("profile.html", username=username)
+    return render_template("profile.html", username=session["user"])
 
 
 @app.route("/logout")
 def logout():
-    """Logs the user out by removing them from the session."""
-    # remove user from session cookie
+    """Logs the user out."""
     flash("You have been logged out")
-    session.pop("user")
+    session.pop("user", None)
     return redirect(url_for("login"))
 
 
 @app.route("/add_recipe", methods=["GET", "POST"])
 def add_recipe():
-    """Handles adding a new recipe to the database."""
+    """Handles adding a new recipe."""
     if "user" not in session:
         flash("You need to log in to add a recipe.")
         return redirect(url_for("login"))
-        
+
     if request.method == "POST":
         recipe = {
             "course_name": request.form.get("course_name"),
@@ -130,19 +113,20 @@ def add_recipe():
             "serves": request.form.get("serves"),
             "created_by": session["user"]
         }
-        # Fix 3: Changed 'dishes' to 'recipes' for collection consistency
+
         mongo.db.recipes.insert_one(recipe)
         flash("Recipe Successfully Added")
-        return redirect(url_for("get_recipes")) # Redirect to recipes list
-        
-    # GET request logic
-    # Assume 'ccourses' holds the course categories
-    courses = list(mongo.db.ccourses.find().sort("courses", 1))
-    # Fix 2: Passing 'courses' to the template instead of the undefined 'recipes'
+        return redirect(url_for("get_recipes"))
+
+    # Check your collection name: ccourses vs courses
+    courses = list(mongo.db.courses.find().sort("courses", 1))
+
     return render_template("add_recipe.html", courses=courses)
 
 
 if __name__ == "__main__":
-    app.run(host=os.environ.get("IP"),
-            port=int(os.environ.get("PORT", 5000)), # Changed default port to 5000 standard
-            debug=True)
+    app.run(
+        host=os.environ.get("IP", "0.0.0.0"),
+        port=int(os.environ.get("PORT", 5001)),
+        debug=True
+    )
