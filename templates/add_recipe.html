@@ -11,7 +11,7 @@
             <select name="course_name" required>
                 <option value="" disabled selected>Choose a course</option>
                 {% for course in courses %}
-                    <option value="{{ course.courses }}">{{ course.courses }}</option>
+                    <option value="{{ course.recipe_course }}">{{ course.recipe_course }}</option>
                 {% endfor %}
             </select>
             <label>Course</label>
