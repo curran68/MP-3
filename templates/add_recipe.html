@@ -1,23 +1,56 @@
 {% extends "base.html" %}
+
 {% block content %}
+<h3 class="center-align">Add a New Recipe</h3>
 
-<h3 class="center-align">Add Recipe</h3>
+<div class="row">
+    <form class="col s12" method="POST" action="{{ url_for('add_recipe') }}">
 
-<!--collapsible from materialize-->
-<ul class="collapsible popout">
-    { for recipe in recipes %}
-    <li>
-        <div class="collapsible-header white-text blue-grey lighten-1 text-shadow">
-            <i class="fas fa-caret-down"></i>
-            <strong>{{ recipe.recipe_name }}</strong> : {{ recipe.serves }}
+        <!-- Course dropdown -->
+        <div class="input-field col s12">
+            <select name="course_name" required>
+                <option value="" disabled selected>Choose a course</option>
+                {% for course in courses %}
+                    <option value="{{ course.courses }}">{{ course.courses }}</option>
+                {% endfor %}
+            </select>
+            <label>Course</label>
         </div>
-        <div class="collapsible-body">
-            <strong>{{ recipe.course_name }}</strong>
-            <p>{{ recipe.ingredients_list }}</p>
+
+        <!-- Recipe name -->
+        <div class="input-field col s12">
+            <input type="text" name="recipe_name" required>
+            <label for="recipe_name">Recipe Name</label>
         </div>
-    </li>
-    { endfor}
-</ul>
 
+        <!-- Ingredients -->
+        <div class="input-field col s12">
+            <textarea name="ingredients_list" class="materialize-textarea" required></textarea>
+            <label for="ingredients_list">Ingredients</label>
+        </div>
 
+        <!-- Method -->
+        <div class="input-field col s12">
+            <textarea name="method_list" class="materialize-textarea" required></textarea>
+            <label for="method_list">Method</label>
+        </div>
+
+        <!-- Cook time -->
+        <div class="input-field col s6">
+            <input type="text" name="cook_time" required>
+            <label for="cook_time">Cook Time</label>
+        </div>
+
+        <!-- Serves -->
+        <div class="input-field col s6">
+            <input type="text" name="serves" required>
+            <label for="serves">Serves</label>
+        </div>
+
+        <!-- Submit -->
+        <div class="col s12 center-align">
+            <button type="submit" class="btn blue-grey lighten-1">Add Recipe</button>
+        </div>
+    </form>
+</div>
 {% endblock %}
