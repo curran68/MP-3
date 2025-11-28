@@ -132,4 +132,17 @@ body {
 
   }
  
-  
+  .email-link {
+    color: #ffffff;     /* change to any colour */
+    text-decoration: none;
+}
+
+.email-link:hover {
+    color: #ffcc00;     /* hover colour (optional) */
+    text-decoration: underline;
+}
+.footer-copyright {
+    background-color: black;
+    color: white;
+    padding: 10px 0;
+  }
