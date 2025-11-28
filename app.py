@@ -149,6 +149,29 @@ def add_recipe():
 
 
 # --------------------------
+# CONTACT PAGE
+# --------------------------
+@app.route("/contact", methods=["GET", "POST"])
+def contact():
+    if request.method == "POST":
+        name = request.form.get("name")
+        email = request.form.get("email")
+        message = request.form.get("message")
+
+        # For now: print the message to Heroku logs (works fine for MS3)
+        print("CONTACT FORM SUBMISSION:")
+        print("Name:", name)
+        print("Email:", email)
+        print("Message:", message)
+
+        flash("Your message has been sent! Thank you for contacting us.")
+        return redirect(url_for("contact"))
+
+    return render_template("contact.html")
+
+
+
+# --------------------------
 # RUN APP
 # --------------------------
 if __name__ == "__main__":
