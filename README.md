@@ -1,5 +1,8 @@
 # 🌮 **Mexicana – Recipe Web Application**
 
+
+![Mexicana Mockups Dark](static/wires/mock.png)
+
 Mexicana is a full-stack recipe management application that allows users to explore, create, edit and store Mexican-inspired food recipes. The site features user accounts, CRUD functionality, category filtering, Materialize UI, and a clean responsive layout.
 
 This project was built using **Flask**, **MongoDB**, **Materialize CSS**, and is deployed on **Heroku**.
@@ -207,7 +210,7 @@ Example placeholder:
 
 ```
 
-![Home Page Screenshot](static/images/screenshot-home.png)
+![Home Page Screenshot](static/wires/screen.png)
 ```
 
 ------
