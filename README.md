@@ -210,7 +210,8 @@ Example placeholder:
 
 ```
 
-![Website homepage hero for Mexicana recipe web app on a pale yellow background with large heading Welcome To Mexicana and subheading Discover Simple and Tasty Mexican Recipes. Below the heading are three side by side food photos with black borders and small teal links labelled Starters, Mains, Desserts. Left photo shows three tacos on a plate with lime wedges, center photo shows a pan of pasta or noodles with shrimp and herbs, right photo shows a rolled dessert drizzled with caramel and sprinkled with chopped nuts. Overall tone warm, appetizing, and inviting.](static/wires/screen.png)
+![Screenshot](/static/wires/screen.png)
+
 
 ```
 
