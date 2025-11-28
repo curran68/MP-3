@@ -199,18 +199,18 @@ The site provides a modern, responsive, mobile-first interface using Materialize
 *Add your screenshots here once ready:*
 
 - Home page
-- Hero section
-- Recipes list
-- Add recipe form
-- Login / Register pages
-- Profile
-- Mobile view
 
 Example placeholder:
 
 
 
 ![Home Page](static/wires/home.png)
+
+- Wireframes
+
+![Landing Page](static/wires/index.png)
+
+![Option Page](static/wires/login.png)
 
 
 
