@@ -208,9 +208,10 @@ The site provides a modern, responsive, mobile-first interface using Materialize
 
 Example placeholder:
 
-```
 
-![Screenshot](static/wires/home.png)
+
+![Home Page](static/wires/home.png)
+
 
 
 
