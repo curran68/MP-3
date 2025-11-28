@@ -212,6 +212,8 @@ Example placeholder:
 
 ![Option Page](static/wires/login.png)
 
+![lighthouse](static/wires/lighthouse.png)
+
 
 
 
@@ -220,6 +222,8 @@ Example placeholder:
 ------
 
 # 🧪 **Testing**
+
+
 
 ### ✔ Manual Testing
 
@@ -236,3 +240,4 @@ Example placeholder:
 - HTML validated via W3C
 - CSS validated
 - Python validated with Flake8
+
