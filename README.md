@@ -210,7 +210,8 @@ Example placeholder:
 
 ```
 
-![Screenshot](/static/wires/screen.png)
+![Screenshot](static/wires/home.png)
+
 
 
 ```
