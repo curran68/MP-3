@@ -7,6 +7,9 @@ Mexicana is a full-stack recipe management application that allows users to expl
 
 This project was built using **Flask**, **MongoDB**, **Materialize CSS**, and is deployed on **Heroku**.
 
+Github URL - https://github.com/curran68/MP-3.git
+Heroku URL - https://dbmongomc-f0b39baaeeee.herokuapp.com/
+
 ------
 
 ## 📖 **Table of Contents**
